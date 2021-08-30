@@ -27,7 +27,9 @@ Once you're comfortable with Terraform, ensure you have the Prerequisites below 
      az login
      ```
 
-1. (OPTIONAL) Deploying with a Service Principal? This requires code changes, check out [Deploying with a Service Principal](#Deploying-with-a-Service-Principal)
+1. (OPTIONAL) Deploying to a Cloud other than Azure Commercial? This requires updating the `azurerm` provider block `environment` and `metadata_host` values. Checkout the [Deploying to Other Clouds](#Deploying-to-Other-Clouds) documentation.
+
+1. (OPTIONAL) Deploying with a Service Principal? This requires updating the `azurerm` provider block. Check out the [Deploying with a Service Principal](#Deploying-with-a-Service-Principal) documentation.
 
 ## Terraform init
 
@@ -125,6 +127,23 @@ The development container definition downloads the required Terraform plugin pro
 
 See the development container [README](/.devcontainer/README.md) for more details on building and running the container.
 
-## Helpful Links
+## Deploying to Other Clouds
+
+The `azurerm` Terraform provider provides a mechanism for changing the Azure cloud in which to deploy Terraform modules.
+
+When specifying your provider, pass in the correct value for `environment` and `metadata_host` for the cloud you're targeting:
+
+```terraform
+provider "azurerm" {
+  features {}
+  
+  environment     = var.tf_environment # e.g. 'public' or 'usgovernment'
+  metadata_host   = var.mlz_metadatahost # e.g. 'management.azure.com' or 'management.usgovcloudapi.net'
+}
+```
+
+For the supported `environment` values, see this doc: <https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs#environment/>
+
+For the supported `metadata_host` values, see this doc: <https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs#metadata_host/>
 
 For more endpoint mappings between AzureCloud and AzureUsGovernment: <https://docs.microsoft.com/en-us/azure/azure-government/compare-azure-government-global-azure#guidance-for-developers/>
