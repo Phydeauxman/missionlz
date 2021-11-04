@@ -14,7 +14,7 @@ param publicIPAddressAvailabilityZones array
 
 param ipConfigurationName string
 
-resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
+resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2018-11-01' = {
   name: publicIPAddressName
   location: location
   tags: tags
@@ -30,7 +30,7 @@ resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
   zones: publicIPAddressAvailabilityZones
 }
 
-resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2018-11-01' = {
   name: '${virtualNetworkName}/${subnetName}'
 
   properties: {
@@ -38,7 +38,7 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
   }
 }
 
-resource bastionHost 'Microsoft.Network/bastionHosts@2021-02-01' = {
+resource bastionHost 'Microsoft.Network/bastionHosts@2018-11-01' = {
   name: name
   location: location
   tags: tags

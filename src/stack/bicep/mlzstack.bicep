@@ -7,7 +7,6 @@ targetScope = 'subscription'
 
 module hubResourceGroup './modules/resourceGroup.bicep' = {
   name: 'deploy-hub-rg-${nowUtc}'
-  scope: subscription(hubSubscriptionId)
   params: {
     name: hubResourceGroupName
     location: hubLocation
@@ -17,7 +16,6 @@ module hubResourceGroup './modules/resourceGroup.bicep' = {
 
 module identityResourceGroup './modules/resourceGroup.bicep' = {
   name: 'deploy-identity-rg-${nowUtc}'
-  scope: subscription(identitySubscriptionId)
   params: {
     name: identityResourceGroupName
     location: identityLocation
@@ -27,7 +25,6 @@ module identityResourceGroup './modules/resourceGroup.bicep' = {
 
 module operationsResourceGroup './modules/resourceGroup.bicep' = {
   name: 'deploy-operations-rg-${nowUtc}'
-  scope: subscription(operationsSubscriptionId)
   params: {
     name: operationsResourceGroupName
     location: operationsLocation
@@ -37,7 +34,6 @@ module operationsResourceGroup './modules/resourceGroup.bicep' = {
 
 module sharedServicesResourceGroup './modules/resourceGroup.bicep' = {
   name: 'deploy-sharedServices-rg-${nowUtc}'
-  scope: subscription(sharedServicesSubscriptionId)
   params: {
     name: sharedServicesResourceGroupName
     location: sharedServicesLocation
@@ -47,28 +43,31 @@ module sharedServicesResourceGroup './modules/resourceGroup.bicep' = {
 
 //// logging
 
-module logAnalyticsWorkspace './modules/logAnalyticsWorkspace.bicep' = {
-  name: 'deploy-laws-${nowUtc}'
-  scope: resourceGroup(operationsSubscriptionId, operationsResourceGroupName)
-  params: {
-    name: logAnalyticsWorkspaceName
-    location: logAnalyticsWorkspaceLocation
-    tags: tags
+// module logAnalyticsWorkspace './modules/logAnalyticsWorkspace.bicep' = {
+//   name: 'deploy-laws-${nowUtc}'
+//   scope: resourceGroup(operationsResourceGroupName)
+//   params: {
+//     name: logAnalyticsWorkspaceName
+//     location: logAnalyticsWorkspaceLocation
+//     tags: tags
 
-    retentionInDays: logAnalyticsWorkspaceRetentionInDays
-    skuName: logAnalyticsWorkspaceSkuName
-    workspaceCappingDailyQuotaGb: logAnalyticsWorkspaceCappingDailyQuotaGb
-  }
-  dependsOn: [
-    operationsResourceGroup
-  ]
-}
+//     retentionInDays: logAnalyticsWorkspaceRetentionInDays
+//     skuName: logAnalyticsWorkspaceSkuName
+//     workspaceCappingDailyQuotaGb: logAnalyticsWorkspaceCappingDailyQuotaGb
+//   }
+//   dependsOn: [
+//     operationsResourceGroup
+//   ]
+// }
 
 //// hub and spoke
 
 module hub './modules/hubNetwork.bicep' = {
   name: 'deploy-hub-${nowUtc}'
-  scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
+  scope: resourceGroup(hubResourceGroupName)
+  dependsOn: [
+    hubResourceGroup
+    ]
   params: {
     location: hubLocation
     tags: tags
@@ -76,30 +75,30 @@ module hub './modules/hubNetwork.bicep' = {
     logStorageAccountName: hubLogStorageAccountName
     logStorageSkuName: hubLogStorageSkuName
 
-    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
-    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
+//     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+//     logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
 
     virtualNetworkName: hubVirtualNetworkName
     virtualNetworkAddressPrefix: hubVirtualNetworkAddressPrefix
-    virtualNetworkDiagnosticsLogs: hubVirtualNetworkDiagnosticsLogs
-    virtualNetworkDiagnosticsMetrics: hubVirtualNetworkDiagnosticsMetrics
+    // virtualNetworkDiagnosticsLogs: hubVirtualNetworkDiagnosticsLogs
+    // virtualNetworkDiagnosticsMetrics: hubVirtualNetworkDiagnosticsMetrics
 
     networkSecurityGroupName: hubNetworkSecurityGroupName
     networkSecurityGroupRules: hubNetworkSecurityGroupRules
-    networkSecurityGroupDiagnosticsLogs: hubNetworkSecurityGroupDiagnosticsLogs
-    networkSecurityGroupDiagnosticsMetrics: hubNetworkSecurityGroupDiagnosticsMetrics
+    // networkSecurityGroupDiagnosticsLogs: hubNetworkSecurityGroupDiagnosticsLogs
+    // networkSecurityGroupDiagnosticsMetrics: hubNetworkSecurityGroupDiagnosticsMetrics
 
     subnetName: hubSubnetName
     subnetAddressPrefix: hubSubnetAddressPrefix
-    subnetServiceEndpoints: hubSubnetServiceEndpoints
+    // subnetServiceEndpoints: hubSubnetServiceEndpoints
 
-    firewallName: firewallName
-    firewallSkuTier: firewallSkuTier
-    firewallPolicyName: firewallPolicyName
-    firewallThreatIntelMode: firewallThreatIntelMode
-    firewallDiagnosticsLogs: firewallDiagnosticsLogs
-    firewallDiagnosticsMetrics: firewallDiagnosticsMetrics
-    firewallClientIpConfigurationName: firewallClientIpConfigurationName
+    // firewallName: firewallName
+    // firewallSkuTier: firewallSkuTier
+    // firewallPolicyName: firewallPolicyName
+    // firewallThreatIntelMode: firewallThreatIntelMode
+    // firewallDiagnosticsLogs: firewallDiagnosticsLogs
+    // firewallDiagnosticsMetrics: firewallDiagnosticsMetrics
+    // firewallClientIpConfigurationName: firewallClientIpConfigurationName
     firewallClientSubnetName: firewallClientSubnetName
     firewallClientSubnetAddressPrefix: firewallClientSubnetAddressPrefix
     firewallClientSubnetServiceEndpoints: firewallClientSubnetServiceEndpoints
@@ -107,7 +106,7 @@ module hub './modules/hubNetwork.bicep' = {
     firewallClientPublicIPAddressSkuName: firewallClientPublicIPAddressSkuName
     firewallClientPublicIpAllocationMethod: firewallClientPublicIpAllocationMethod
     firewallClientPublicIPAddressAvailabilityZones: firewallClientPublicIPAddressAvailabilityZones
-    firewallManagementIpConfigurationName: firewallManagementIpConfigurationName
+    // firewallManagementIpConfigurationName: firewallManagementIpConfigurationName
     firewallManagementSubnetName: firewallManagementSubnetName
     firewallManagementSubnetAddressPrefix: firewallManagementSubnetAddressPrefix
     firewallManagementSubnetServiceEndpoints: firewallManagementSubnetServiceEndpoints
@@ -116,14 +115,14 @@ module hub './modules/hubNetwork.bicep' = {
     firewallManagementPublicIpAllocationMethod: firewallManagementPublicIpAllocationMethod
     firewallManagementPublicIPAddressAvailabilityZones: firewallManagementPublicIPAddressAvailabilityZones
 
-    publicIPAddressDiagnosticsLogs: publicIPAddressDiagnosticsLogs
-    publicIPAddressDiagnosticsMetrics: publicIPAddressDiagnosticsMetrics
+    // publicIPAddressDiagnosticsLogs: publicIPAddressDiagnosticsLogs
+    // publicIPAddressDiagnosticsMetrics: publicIPAddressDiagnosticsMetrics
   }
 }
 
 module identity './modules/spokeNetwork.bicep' = {
   name: 'deploy-identity-spoke-${nowUtc}'
-  scope: resourceGroup(identitySubscriptionId, identityResourceGroupName)
+  scope: resourceGroup(identityResourceGroupName)
   params: {
     location: identityLocation
     tags: tags
@@ -131,29 +130,29 @@ module identity './modules/spokeNetwork.bicep' = {
     logStorageAccountName: identityLogStorageAccountName
     logStorageSkuName: identityLogStorageSkuName
 
-    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
+    // logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
 
-    firewallPrivateIPAddress: hub.outputs.firewallPrivateIPAddress
+    firewallPrivateIPAddress: '10.0.100.4'
 
     virtualNetworkName: identityVirtualNetworkName
     virtualNetworkAddressPrefix: identityVirtualNetworkAddressPrefix
-    virtualNetworkDiagnosticsLogs: identityVirtualNetworkDiagnosticsLogs
-    virtualNetworkDiagnosticsMetrics: identityVirtualNetworkDiagnosticsMetrics
+    // virtualNetworkDiagnosticsLogs: identityVirtualNetworkDiagnosticsLogs
+    // virtualNetworkDiagnosticsMetrics: identityVirtualNetworkDiagnosticsMetrics
 
     networkSecurityGroupName: identityNetworkSecurityGroupName
     networkSecurityGroupRules: identityNetworkSecurityGroupRules
-    networkSecurityGroupDiagnosticsLogs: identityNetworkSecurityGroupDiagnosticsLogs
-    networkSecurityGroupDiagnosticsMetrics: identityNetworkSecurityGroupDiagnosticsMetrics
+    // networkSecurityGroupDiagnosticsLogs: identityNetworkSecurityGroupDiagnosticsLogs
+    // networkSecurityGroupDiagnosticsMetrics: identityNetworkSecurityGroupDiagnosticsMetrics
 
     subnetName: identitySubnetName
     subnetAddressPrefix: identitySubnetAddressPrefix
-    subnetServiceEndpoints: identitySubnetServiceEndpoints
+    // subnetServiceEndpoints: identitySubnetServiceEndpoints
   }
 }
 
 module operations './modules/spokeNetwork.bicep' = {
   name: 'deploy-operations-spoke-${nowUtc}'
-  scope: resourceGroup(operationsSubscriptionId, operationsResourceGroupName)
+  scope: resourceGroup(operationsResourceGroupName)
   params: {
     location: operationsLocation
     tags: tags
@@ -161,29 +160,29 @@ module operations './modules/spokeNetwork.bicep' = {
     logStorageAccountName: operationsLogStorageAccountName
     logStorageSkuName: operationsLogStorageSkuName
 
-    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
+    // logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
 
-    firewallPrivateIPAddress: hub.outputs.firewallPrivateIPAddress
+    firewallPrivateIPAddress: '10.0.100.4'
 
     virtualNetworkName: operationsVirtualNetworkName
     virtualNetworkAddressPrefix: operationsVirtualNetworkAddressPrefix
-    virtualNetworkDiagnosticsLogs: operationsVirtualNetworkDiagnosticsLogs
-    virtualNetworkDiagnosticsMetrics: operationsVirtualNetworkDiagnosticsMetrics
+    // virtualNetworkDiagnosticsLogs: operationsVirtualNetworkDiagnosticsLogs
+    // virtualNetworkDiagnosticsMetrics: operationsVirtualNetworkDiagnosticsMetrics
 
     networkSecurityGroupName: operationsNetworkSecurityGroupName
     networkSecurityGroupRules: operationsNetworkSecurityGroupRules
-    networkSecurityGroupDiagnosticsLogs: operationsNetworkSecurityGroupDiagnosticsLogs
-    networkSecurityGroupDiagnosticsMetrics: operationsNetworkSecurityGroupDiagnosticsMetrics
+    // networkSecurityGroupDiagnosticsLogs: operationsNetworkSecurityGroupDiagnosticsLogs
+    // networkSecurityGroupDiagnosticsMetrics: operationsNetworkSecurityGroupDiagnosticsMetrics
 
     subnetName: operationsSubnetName
     subnetAddressPrefix: operationsSubnetAddressPrefix
-    subnetServiceEndpoints: operationsSubnetServiceEndpoints
+    // subnetServiceEndpoints: operationsSubnetServiceEndpoints
   }
 }
 
 module sharedServices './modules/spokeNetwork.bicep' = {
   name: 'deploy-sharedServices-spoke-${nowUtc}'
-  scope: resourceGroup(sharedServicesSubscriptionId, sharedServicesResourceGroupName)
+  scope: resourceGroup(sharedServicesResourceGroupName)
   params: {
     location: sharedServicesLocation
     tags: tags
@@ -191,23 +190,23 @@ module sharedServices './modules/spokeNetwork.bicep' = {
     logStorageAccountName: sharedServicesLogStorageAccountName
     logStorageSkuName: sharedServicesLogStorageSkuName
 
-    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
+    // logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
 
-    firewallPrivateIPAddress: hub.outputs.firewallPrivateIPAddress
+    firewallPrivateIPAddress: '10.0.100.4'
 
     virtualNetworkName: sharedServicesVirtualNetworkName
     virtualNetworkAddressPrefix: sharedServicesVirtualNetworkAddressPrefix
-    virtualNetworkDiagnosticsLogs: sharedServicesVirtualNetworkDiagnosticsLogs
-    virtualNetworkDiagnosticsMetrics: sharedServicesVirtualNetworkDiagnosticsMetrics
+    // virtualNetworkDiagnosticsLogs: sharedServicesVirtualNetworkDiagnosticsLogs
+    // virtualNetworkDiagnosticsMetrics: sharedServicesVirtualNetworkDiagnosticsMetrics
 
     networkSecurityGroupName: sharedServicesNetworkSecurityGroupName
     networkSecurityGroupRules: sharedServicesNetworkSecurityGroupRules
-    networkSecurityGroupDiagnosticsLogs: sharedServicesNetworkSecurityGroupDiagnosticsLogs
-    networkSecurityGroupDiagnosticsMetrics: sharedServicesNetworkSecurityGroupDiagnosticsMetrics
+    // networkSecurityGroupDiagnosticsLogs: sharedServicesNetworkSecurityGroupDiagnosticsLogs
+    // networkSecurityGroupDiagnosticsMetrics: sharedServicesNetworkSecurityGroupDiagnosticsMetrics
 
     subnetName: sharedServicesSubnetName
     subnetAddressPrefix: sharedServicesSubnetAddressPrefix
-    subnetServiceEndpoints: sharedServicesSubnetServiceEndpoints
+    // subnetServiceEndpoints: sharedServicesSubnetServiceEndpoints
   }
 }
 
@@ -215,7 +214,6 @@ module sharedServices './modules/spokeNetwork.bicep' = {
 
 module hubVirtualNetworkPeerings './modules/hubNetworkPeerings.bicep' = {
   name: 'deploy-hub-peerings-${nowUtc}'
-  scope: subscription(hubSubscriptionId)
   params: {
     hubResourceGroupName: hubResourceGroup.outputs.name
     hubVirtualNetworkName: hub.outputs.virtualNetworkName
@@ -232,7 +230,6 @@ module hubVirtualNetworkPeerings './modules/hubNetworkPeerings.bicep' = {
 
 module identityVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
   name: 'deploy-identity-peerings-${nowUtc}'
-  scope: subscription(identitySubscriptionId)
   params: {
     spokeResourceGroupName: identityResourceGroup.outputs.name
     spokeVirtualNetworkName: identity.outputs.virtualNetworkName
@@ -244,7 +241,6 @@ module identityVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
 
 module operationsVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
   name: 'deploy-operations-peerings-${nowUtc}'
-  scope: subscription(operationsSubscriptionId)
   params: {
     spokeResourceGroupName: operationsResourceGroup.outputs.name
     spokeVirtualNetworkName: operations.outputs.virtualNetworkName
@@ -256,7 +252,6 @@ module operationsVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
 
 module sharedServicesVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
   name: 'deploy-sharedServices-peerings-${nowUtc}'
-  scope: subscription(sharedServicesSubscriptionId)
   params: {
     spokeResourceGroupName: sharedServicesResourceGroup.outputs.name
     spokeVirtualNetworkName: sharedServices.outputs.virtualNetworkName
@@ -268,144 +263,136 @@ module sharedServicesVirtualNetworkPeering './modules/spokeNetworkPeering.bicep'
 
 //// policy
 
-module hubPolicyAssignment './modules/policyAssignment.bicep' = {
-  name: 'assign-policy-hub-${nowUtc}'
-  scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
-  params: {
-    builtInAssignment: policy
-    logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
-    logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
-    operationsSubscriptionId: operationsSubscriptionId
-  }
-}
+// module hubPolicyAssignment './modules/policyAssignment.bicep' = {
+//   name: 'assign-policy-hub-${nowUtc}'
+//   scope: resourceGroup(hubResourceGroupName)
+//   params: {
+//     builtInAssignment: policy
+//     // logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
+//     // logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
+//     operationsSubscriptionId: operationsSubscriptionId
+//   }
+// }
 
-module operationsPolicyAssignment './modules/policyAssignment.bicep' = {
-  name: 'assign-policy-operations-${nowUtc}'
-  scope: resourceGroup(operationsSubscriptionId, operationsResourceGroupName)
-  params: {
-    builtInAssignment: policy
-    logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
-    logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
-    operationsSubscriptionId: operationsSubscriptionId
-  }
-}
+// module operationsPolicyAssignment './modules/policyAssignment.bicep' = {
+//   name: 'assign-policy-operations-${nowUtc}'
+//   scope: resourceGroup(operationsResourceGroupName)
+//   params: {
+//     builtInAssignment: policy
+//     // logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
+//     // logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
+//     operationsSubscriptionId: operationsSubscriptionId
+//   }
+// }
 
-module sharedServicesPolicyAssignment './modules/policyAssignment.bicep' = {
-  name: 'assign-policy-sharedServices-${nowUtc}'
-  scope: resourceGroup(sharedServicesSubscriptionId, sharedServicesResourceGroupName)
-  params: {
-    builtInAssignment: policy
-    logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
-    logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
-    operationsSubscriptionId: operationsSubscriptionId
-  }
-}
+// module sharedServicesPolicyAssignment './modules/policyAssignment.bicep' = {
+//   name: 'assign-policy-sharedServices-${nowUtc}'
+//   scope: resourceGroup(sharedServicesResourceGroupName)
+//   params: {
+//     builtInAssignment: policy
+//     // logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
+//     // logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
+//     operationsSubscriptionId: operationsSubscriptionId
+//   }
+// }
 
-module identityPolicyAssignment './modules/policyAssignment.bicep' = {
-  name: 'assign-policy-identity-${nowUtc}'
-  scope: resourceGroup(identitySubscriptionId, identityResourceGroupName)
-  params: {
-    builtInAssignment: policy
-    logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
-    logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
-    operationsSubscriptionId: operationsSubscriptionId
-  }
-}
+// module identityPolicyAssignment './modules/policyAssignment.bicep' = {
+//   name: 'assign-policy-identity-${nowUtc}'
+//   scope: resourceGroup(identityResourceGroupName)
+//   params: {
+//     builtInAssignment: policy
+//     // logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
+//     // logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
+//     operationsSubscriptionId: operationsSubscriptionId
+//   }
+// }
 
-module hubSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = {
-  name: 'activity-logs-hub-${nowUtc}'
-  scope: subscription(hubSubscriptionId)
-  params: {
-    diagnosticSettingName: 'log-hub-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
-  }
-}
+// module hubSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = {
+//   name: 'activity-logs-hub-${nowUtc}'
+//   params: {
+//     diagnosticSettingName: 'log-hub-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
+//     logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+//   }
+// }
 
-module operationsSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = if(hubSubscriptionId != operationsSubscriptionId) {
-  name: 'activity-logs-operations-${nowUtc}'
-  scope: subscription(operationsSubscriptionId)
-  params: {
-    diagnosticSettingName: 'log-operations-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
-  }
-}
+// module operationsSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = if(hubSubscriptionId != operationsSubscriptionId) {
+//   name: 'activity-logs-operations-${nowUtc}'
+//   params: {
+//     diagnosticSettingName: 'log-operations-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
+//     logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+//   }
+// }
 
-module identitySubscriptionCreateActivityLogging './modules/centralLogging.bicep' = if(hubSubscriptionId != identitySubscriptionId) {
-  name: 'activity-logs-identity-${nowUtc}'
-  scope: subscription(identitySubscriptionId)
-  params: {
-    diagnosticSettingName: 'log-identity-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
-  }
-}
+// module identitySubscriptionCreateActivityLogging './modules/centralLogging.bicep' = if(hubSubscriptionId != identitySubscriptionId) {
+//   name: 'activity-logs-identity-${nowUtc}'
+//   params: {
+//     diagnosticSettingName: 'log-identity-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
+//     logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+//   }
+// }
 
-module sharedServicesSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = if(hubSubscriptionId != sharedServicesSubscriptionId) {
-  name: 'activity-logs-sharedServices-${nowUtc}'
-  scope: subscription(sharedServicesSubscriptionId)
-  params: {
-    diagnosticSettingName: 'log-sharedServices-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
-  }
-}
+// module sharedServicesSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = if(hubSubscriptionId != sharedServicesSubscriptionId) {
+//   name: 'activity-logs-sharedServices-${nowUtc}'
+//   params: {
+//     diagnosticSettingName: 'log-sharedServices-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
+//     logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+//   }
+// }
 
 // operations' log analytic workspace diagnostic logging
 
-module logAnalyticsDiagnosticLogging './modules/logAnalyticsDiagnosticLogging.bicep' = {
-  name: 'delpoy-diagnostic-logging-LAWS'
-  scope: resourceGroup(operationsSubscriptionId, operationsResourceGroupName)
-  params: {
-    diagnosticStorageAccountName: operationsLogStorageAccountName
-    logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
-    enableDiagnostics: true
-  }
-  dependsOn: [
-    operations
-  ]
-}
+// module logAnalyticsDiagnosticLogging './modules/logAnalyticsDiagnosticLogging.bicep' = {
+//   name: 'delpoy-diagnostic-logging-LAWS'
+//   scope: resourceGroup(operationsResourceGroupName)
+//   params: {
+//     diagnosticStorageAccountName: operationsLogStorageAccountName
+//     logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
+//     enableDiagnostics: true
+//   }
+//   dependsOn: [
+//     operations
+//   ]
+// }
 
 // security center per subscription if different per hub/spoke
 
-module hubSecurityCenter './modules/securityCenter.bicep' = if(deployASC){
-  name: 'set-hub-sub-security-center'
-  scope: subscription(hubSubscriptionId)
-  params: {
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
-    emailSecurityContact: emailSecurityContact
-  }
-}
+// module hubSecurityCenter './modules/securityCenter.bicep' = if(deployASC){
+//   name: 'set-hub-sub-security-center'
+//   params: {
+//     logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+//     emailSecurityContact: emailSecurityContact
+//   }
+// }
 
-module operationsSecurityCenter './modules/securityCenter.bicep' = if(deployASC && hubSubscriptionId != operationsSubscriptionId) {
-  name: 'set-operations-sub-security-center'
-  scope: subscription(operationsSubscriptionId)
-  params: {
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
-    emailSecurityContact: emailSecurityContact
-  }
-}
+// module operationsSecurityCenter './modules/securityCenter.bicep' = if(deployASC && hubSubscriptionId != operationsSubscriptionId) {
+//   name: 'set-operations-sub-security-center'
+//   params: {
+//     logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+//     emailSecurityContact: emailSecurityContact
+//   }
+// }
 
-module identitySecurityCenter './modules/securityCenter.bicep' = if(deployASC && hubSubscriptionId != identitySubscriptionId) {
-  name: 'set-identity-sub-security-center'
-  scope: subscription(identitySubscriptionId)
-  params: {
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
-    emailSecurityContact: emailSecurityContact
-  }
-}
+// module identitySecurityCenter './modules/securityCenter.bicep' = if(deployASC && hubSubscriptionId != identitySubscriptionId) {
+//   name: 'set-identity-sub-security-center'
+//   params: {
+//     logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+//     emailSecurityContact: emailSecurityContact
+//   }
+// }
 
-module sharedServicesSecurityCenter './modules/securityCenter.bicep' = if(deployASC && hubSubscriptionId != sharedServicesSubscriptionId) {
-  name: 'set-sharedServices-sub-security-center'
-  scope: subscription(sharedServicesSubscriptionId)
-  params: {
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
-    emailSecurityContact: emailSecurityContact
-  }
-}
+// module sharedServicesSecurityCenter './modules/securityCenter.bicep' = if(deployASC && hubSubscriptionId != sharedServicesSubscriptionId) {
+//   name: 'set-sharedServices-sub-security-center'
+//   params: {
+//     logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+//     emailSecurityContact: emailSecurityContact
+//   }
+// }
 
 //// remote access
 
 module remoteAccess './modules/remoteAccess.bicep' = if(deployRemoteAccess) {
   name: 'deploy-remote-access-${nowUtc}'
-  scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
+  scope: resourceGroup(hubResourceGroupName)
 
   params: {
     location: hubLocation
@@ -453,7 +440,7 @@ module remoteAccess './modules/remoteAccess.bicep' = if(deployRemoteAccess) {
     windowsVmCreateOption: windowsVmCreateOption
     windowsVmStorageAccountType: windowsVmStorageAccountType
 
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+    // logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
   }
 }
 
@@ -468,11 +455,11 @@ param identitySubscriptionId string = hubSubscriptionId
 param operationsSubscriptionId string = hubSubscriptionId
 param sharedServicesSubscriptionId string = hubSubscriptionId
 
-@allowed([
-  'Standard'
-  'Premium'
-])
-param firewallSkuTier string = 'Premium'
+// @allowed([
+//   'Standard'
+//   'Premium'
+// ])
+// param firewallSkuTier string = 'Premium'
 
 param hubResourceGroupName string = '${resourcePrefix}-hub'
 param hubLocation string = deployment().location
@@ -480,8 +467,8 @@ param hubVirtualNetworkName string = 'hub-vnet'
 param hubSubnetName string = 'hub-subnet'
 param hubVirtualNetworkAddressPrefix string = '10.0.100.0/24'
 param hubSubnetAddressPrefix string = '10.0.100.128/27'
-param hubVirtualNetworkDiagnosticsLogs array = []
-param hubVirtualNetworkDiagnosticsMetrics array = []
+// param hubVirtualNetworkDiagnosticsLogs array = []
+// param hubVirtualNetworkDiagnosticsMetrics array = []
 param hubNetworkSecurityGroupName string = 'hub-nsg'
 param hubNetworkSecurityGroupRules array = [
   {
@@ -513,84 +500,84 @@ param hubNetworkSecurityGroupRules array = [
     }
   }
 ]
-param hubNetworkSecurityGroupDiagnosticsLogs array = [
-  {
-    category: 'NetworkSecurityGroupEvent'
-    enabled: true
-  }
-  {
-    category: 'NetworkSecurityGroupRuleCounter'
-    enabled: true
-  }
-]
-param hubNetworkSecurityGroupDiagnosticsMetrics array = []
-param hubSubnetServiceEndpoints array = [
-  {
-    service: 'Microsoft.Storage'
-  }
-]
+// param hubNetworkSecurityGroupDiagnosticsLogs array = [
+//   {
+//     category: 'NetworkSecurityGroupEvent'
+//     enabled: true
+//   }
+//   {
+//     category: 'NetworkSecurityGroupRuleCounter'
+//     enabled: true
+//   }
+// ]
+// param hubNetworkSecurityGroupDiagnosticsMetrics array = []
+// param hubSubnetServiceEndpoints array = [
+//   {
+//     service: 'Microsoft.Storage'
+//   }
+// ]
 param hubLogStorageAccountName string = toLower(take('hublogs${uniqueId}', 24))
-param hubLogStorageSkuName string = 'Standard_GRS'
+param hubLogStorageSkuName string =  'Standard_LRS' //'Standard_GRS'
 
-param firewallName string = 'firewall'
+// param firewallName string = 'firewall'
 param firewallManagementSubnetAddressPrefix string = '10.0.100.64/26'
 param firewallClientSubnetAddressPrefix string = '10.0.100.0/26'
-param firewallPolicyName string = 'firewall-policy'
-param firewallThreatIntelMode string = 'Alert'
-param firewallDiagnosticsLogs array = [
-  {
-    category: 'AzureFirewallApplicationRule'
-    enabled: true
-  }
-  {
-    category: 'AzureFirewallNetworkRule'
-    enabled: true
-  }
-  {
-    category: 'AzureFirewallDnsProxy'
-    enabled: true
-  }
-]
-param firewallDiagnosticsMetrics array = [
-  {
-    category: 'AllMetrics'
-    enabled: true
-  }
-]
+// param firewallPolicyName string = 'firewall-policy'
+// param firewallThreatIntelMode string = 'Alert'
+// param firewallDiagnosticsLogs array = [
+//   {
+//     category: 'AzureFirewallApplicationRule'
+//     enabled: true
+//   }
+//   {
+//     category: 'AzureFirewallNetworkRule'
+//     enabled: true
+//   }
+//   {
+//     category: 'AzureFirewallDnsProxy'
+//     enabled: true
+//   }
+// ]
+// param firewallDiagnosticsMetrics array = [
+//   {
+//     category: 'AllMetrics'
+//     enabled: true
+//   }
+// ]
 var firewallClientSubnetName = 'AzureFirewallSubnet' //this must be 'AzureFirewallSubnet'
-param firewallClientIpConfigurationName string = 'firewall-client-ip-config'
+// param firewallClientIpConfigurationName string = 'firewall-client-ip-config'
 param firewallClientSubnetServiceEndpoints array = []
 param firewallClientPublicIPAddressName string = 'firewall-client-public-ip'
-param firewallClientPublicIPAddressSkuName string = 'Standard'
+param firewallClientPublicIPAddressSkuName string = 'Basic'
 param firewallClientPublicIpAllocationMethod string = 'Static'
 param firewallClientPublicIPAddressAvailabilityZones array = []
 var firewallManagementSubnetName = 'AzureFirewallManagementSubnet' //this must be 'AzureFirewallManagementSubnet'
-param firewallManagementIpConfigurationName string = 'firewall-management-ip-config'
+// param firewallManagementIpConfigurationName string = 'firewall-management-ip-config'
 param firewallManagementSubnetServiceEndpoints array = []
 param firewallManagementPublicIPAddressName string = 'firewall-management-public-ip'
-param firewallManagementPublicIPAddressSkuName string = 'Standard'
+param firewallManagementPublicIPAddressSkuName string = 'Basic'
 param firewallManagementPublicIpAllocationMethod string = 'Static'
 param firewallManagementPublicIPAddressAvailabilityZones array = []
-param publicIPAddressDiagnosticsLogs array = [
-  {
-    category: 'DDoSProtectionNotifications'
-    enabled: true
-  }
-  {
-    category: 'DDoSMitigationFlowLogs'
-    enabled: true
-  }
-  {
-    category: 'DDoSMitigationReports'
-    enabled: true
-  }
-]
-param publicIPAddressDiagnosticsMetrics array = [
-  {
-    category: 'AllMetrics'
-    enabled: true
-  }
-]
+// param publicIPAddressDiagnosticsLogs array = [
+//   {
+//     category: 'DDoSProtectionNotifications'
+//     enabled: true
+//   }
+//   {
+//     category: 'DDoSMitigationFlowLogs'
+//     enabled: true
+//   }
+//   {
+//     category: 'DDoSMitigationReports'
+//     enabled: true
+//   }
+// ]
+// param publicIPAddressDiagnosticsMetrics array = [
+//   {
+//     category: 'AllMetrics'
+//     enabled: true
+//   }
+// ]
 
 param identityResourceGroupName string = replace(hubResourceGroupName, 'hub', 'identity')
 param identityLocation string = hubLocation
@@ -598,13 +585,13 @@ param identityVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 
 param identitySubnetName string = replace(hubSubnetName, 'hub', 'identity')
 param identityVirtualNetworkAddressPrefix string = '10.0.110.0/26'
 param identitySubnetAddressPrefix string = '10.0.110.0/27'
-param identityVirtualNetworkDiagnosticsLogs array = hubVirtualNetworkDiagnosticsLogs
-param identityVirtualNetworkDiagnosticsMetrics array = hubVirtualNetworkDiagnosticsMetrics
+// param identityVirtualNetworkDiagnosticsLogs array = hubVirtualNetworkDiagnosticsLogs
+// param identityVirtualNetworkDiagnosticsMetrics array = hubVirtualNetworkDiagnosticsMetrics
 param identityNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'identity')
 param identityNetworkSecurityGroupRules array = hubNetworkSecurityGroupRules
-param identityNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
-param identityNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
-param identitySubnetServiceEndpoints array = hubSubnetServiceEndpoints
+// param identityNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
+// param identityNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
+// param identitySubnetServiceEndpoints array = hubSubnetServiceEndpoints
 param identityLogStorageAccountName string = toLower(take('idlogs${uniqueId}', 24))
 param identityLogStorageSkuName string = hubLogStorageSkuName
 
@@ -612,15 +599,15 @@ param operationsResourceGroupName string = replace(hubResourceGroupName, 'hub', 
 param operationsLocation string = hubLocation
 param operationsVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'operations')
 param operationsVirtualNetworkAddressPrefix string = '10.0.115.0/26'
-param operationsVirtualNetworkDiagnosticsLogs array = hubVirtualNetworkDiagnosticsLogs
-param operationsVirtualNetworkDiagnosticsMetrics array = hubVirtualNetworkDiagnosticsMetrics
+// param operationsVirtualNetworkDiagnosticsLogs array = hubVirtualNetworkDiagnosticsLogs
+// param operationsVirtualNetworkDiagnosticsMetrics array = hubVirtualNetworkDiagnosticsMetrics
 param operationsNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'operations')
 param operationsNetworkSecurityGroupRules array = hubNetworkSecurityGroupRules
-param operationsNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
-param operationsNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
+// param operationsNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
+// param operationsNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param operationsSubnetName string = replace(hubSubnetName, 'hub', 'operations')
 param operationsSubnetAddressPrefix string = '10.0.115.0/27'
-param operationsSubnetServiceEndpoints array = hubSubnetServiceEndpoints
+// param operationsSubnetServiceEndpoints array = hubSubnetServiceEndpoints
 param operationsLogStorageAccountName string = toLower(take('opslogs${uniqueId}', 24))
 param operationsLogStorageSkuName string = hubLogStorageSkuName
 
@@ -630,34 +617,34 @@ param sharedServicesVirtualNetworkName string = replace(hubVirtualNetworkName, '
 param sharedServicesSubnetName string = replace(hubSubnetName, 'hub', 'sharedServices')
 param sharedServicesVirtualNetworkAddressPrefix string = '10.0.120.0/26'
 param sharedServicesSubnetAddressPrefix string = '10.0.120.0/27'
-param sharedServicesVirtualNetworkDiagnosticsLogs array = hubVirtualNetworkDiagnosticsLogs
-param sharedServicesVirtualNetworkDiagnosticsMetrics array = hubVirtualNetworkDiagnosticsMetrics
+// param sharedServicesVirtualNetworkDiagnosticsLogs array = hubVirtualNetworkDiagnosticsLogs
+// param sharedServicesVirtualNetworkDiagnosticsMetrics array = hubVirtualNetworkDiagnosticsMetrics
 param sharedServicesNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'sharedServices')
 param sharedServicesNetworkSecurityGroupRules array = hubNetworkSecurityGroupRules
-param sharedServicesNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
-param sharedServicesNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
-param sharedServicesSubnetServiceEndpoints array = hubSubnetServiceEndpoints
+// param sharedServicesNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
+// param sharedServicesNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
+// param sharedServicesSubnetServiceEndpoints array = hubSubnetServiceEndpoints
 param sharedServicesLogStorageAccountName string = toLower(take('shrdSvclogs${uniqueId}', 24))
 param sharedServicesLogStorageSkuName string = hubLogStorageSkuName
 
-param logAnalyticsWorkspaceName string = take('${resourcePrefix}-laws', 63)
-param logAnalyticsWorkspaceLocation string = operationsLocation
-param logAnalyticsWorkspaceCappingDailyQuotaGb int = -1
-param logAnalyticsWorkspaceRetentionInDays int = 30
-param logAnalyticsWorkspaceSkuName string = 'PerGB2018'
+// param logAnalyticsWorkspaceName string = take('${resourcePrefix}-laws', 63)
+// param logAnalyticsWorkspaceLocation string = operationsLocation
+// param logAnalyticsWorkspaceCappingDailyQuotaGb int = -1
+// param logAnalyticsWorkspaceRetentionInDays int = 30
+// param logAnalyticsWorkspaceSkuName string = 'PerGB2018'
 
-@allowed([
-  'NIST'
-  'IL5' // Gov cloud only, trying to deploy IL5 in AzureCloud will switch to NIST
-  'CMMC'
-  ''
-])
-@description('Built-in policy assignments to assign, default is none. [NIST/IL5/CMMC] IL5 is only availalbe for GOV cloud and will switch to NIST if tried in AzureCloud.')
-param policy string = ''
+// @allowed([
+//   'NIST'
+//   'IL5' // Gov cloud only, trying to deploy IL5 in AzureCloud will switch to NIST
+//   'CMMC'
+//   ''
+// ])
+// @description('Built-in policy assignments to assign, default is none. [NIST/IL5/CMMC] IL5 is only availalbe for GOV cloud and will switch to NIST if tried in AzureCloud.')
+// param policy string = ''
 
-@description('Email address of the contact, in the form of john@doe.com')
-param emailSecurityContact string = ''
-param deployASC bool = false
+// @description('Email address of the contact, in the form of john@doe.com')
+// param emailSecurityContact string = ''
+// param deployASC bool = false
 
 @description('Provision Azure Bastion Host and jumpboxes in this deployment')
 param deployRemoteAccess bool = false
@@ -724,11 +711,11 @@ output hubSubnetResourceId string = hub.outputs.subnetResourceId
 output hubSubnetAddressPrefix string = hub.outputs.subnetAddressPrefix
 output hubNetworkSecurityGroupName string = hub.outputs.networkSecurityGroupName
 output hubNetworkSecurityGroupResourceId string = hub.outputs.networkSecurityGroupResourceId
-output hubFirewallPrivateIPAddress string = hub.outputs.firewallPrivateIPAddress
+// output hubFirewallPrivateIPAddress string = hub.outputs.firewallPrivateIPAddress
 
-output logAnalyticsWorkspaceName string = logAnalyticsWorkspace.outputs.name
-output logAnalyticsWorkspaceResourceId string = logAnalyticsWorkspace.outputs.id
-output firewallPrivateIPAddress string = hub.outputs.firewallPrivateIPAddress
+// output logAnalyticsWorkspaceName string = logAnalyticsWorkspace.outputs.name
+// output logAnalyticsWorkspaceResourceId string = logAnalyticsWorkspace.outputs.id
+// output firewallPrivateIPAddress string = hub.outputs.firewallPrivateIPAddress
 
 output identitySubscriptionId string = identitySubscriptionId
 output identityResourceGroupName string = identityResourceGroup.outputs.name

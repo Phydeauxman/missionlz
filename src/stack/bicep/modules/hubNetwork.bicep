@@ -4,35 +4,35 @@ param tags object = {}
 param logStorageAccountName string
 param logStorageSkuName string
 
-param logAnalyticsWorkspaceName string
-param logAnalyticsWorkspaceResourceId string
+// param logAnalyticsWorkspaceName string
+// param logAnalyticsWorkspaceResourceId string
 
 param virtualNetworkName string
 param virtualNetworkAddressPrefix string
-param virtualNetworkDiagnosticsLogs array
-param virtualNetworkDiagnosticsMetrics array
+// param virtualNetworkDiagnosticsLogs array
+// param virtualNetworkDiagnosticsMetrics array
 
 param networkSecurityGroupName string
 param networkSecurityGroupRules array
-param networkSecurityGroupDiagnosticsLogs array
-param networkSecurityGroupDiagnosticsMetrics array
+// param networkSecurityGroupDiagnosticsLogs array
+// param networkSecurityGroupDiagnosticsMetrics array
 
 param subnetName string
 param subnetAddressPrefix string
-param subnetServiceEndpoints array
+// param subnetServiceEndpoints array
 
 param routeTableName string = '${subnetName}-routetable'
 param routeTableRouteName string = 'default_route'
 param routeTableRouteAddressPrefix string = '0.0.0.0/0'
 param routeTableRouteNextHopType string = 'VirtualAppliance'
 
-param firewallName string
-param firewallSkuTier string
-param firewallPolicyName string
-param firewallThreatIntelMode string
-param firewallDiagnosticsLogs array
-param firewallDiagnosticsMetrics array
-param firewallClientIpConfigurationName string
+// param firewallName string
+// param firewallSkuTier string
+// param firewallPolicyName string
+// param firewallThreatIntelMode string
+// param firewallDiagnosticsLogs array
+// param firewallDiagnosticsMetrics array
+// param firewallClientIpConfigurationName string
 param firewallClientSubnetName string
 param firewallClientSubnetAddressPrefix string
 param firewallClientSubnetServiceEndpoints array
@@ -40,7 +40,7 @@ param firewallClientPublicIPAddressName string
 param firewallClientPublicIPAddressSkuName string
 param firewallClientPublicIpAllocationMethod string
 param firewallClientPublicIPAddressAvailabilityZones array
-param firewallManagementIpConfigurationName string
+// param firewallManagementIpConfigurationName string
 param firewallManagementSubnetName string
 param firewallManagementSubnetAddressPrefix string
 param firewallManagementSubnetServiceEndpoints array
@@ -49,8 +49,8 @@ param firewallManagementPublicIPAddressSkuName string
 param firewallManagementPublicIpAllocationMethod string
 param firewallManagementPublicIPAddressAvailabilityZones array
 
-param publicIPAddressDiagnosticsLogs array
-param publicIPAddressDiagnosticsMetrics array
+// param publicIPAddressDiagnosticsLogs array
+// param publicIPAddressDiagnosticsMetrics array
 
 module logStorage './storageAccount.bicep' = {
   name: 'logStorage'
@@ -71,11 +71,11 @@ module networkSecurityGroup './networkSecurityGroup.bicep' = {
 
     securityRules: networkSecurityGroupRules
 
-    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
-    logStorageAccountResourceId: logStorage.outputs.id
+    // logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+    // logStorageAccountResourceId: logStorage.outputs.id
 
-    logs: networkSecurityGroupDiagnosticsLogs
-    metrics: networkSecurityGroupDiagnosticsMetrics
+    // logs: networkSecurityGroupDiagnosticsLogs
+    // metrics: networkSecurityGroupDiagnosticsMetrics
   }
 }
 
@@ -105,11 +105,11 @@ module virtualNetwork './virtualNetwork.bicep' = {
       }
     ]
 
-    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
-    logStorageAccountResourceId: logStorage.outputs.id
+    // logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+    // logStorageAccountResourceId: logStorage.outputs.id
 
-    logs: virtualNetworkDiagnosticsLogs
-    metrics: virtualNetworkDiagnosticsMetrics
+    // logs: virtualNetworkDiagnosticsLogs
+    // metrics: virtualNetworkDiagnosticsMetrics
   }
 }
 
@@ -122,12 +122,12 @@ module routeTable './routeTable.bicep' = {
 
     routeName: routeTableRouteName
     routeAddressPrefix: routeTableRouteAddressPrefix
-    routeNextHopIpAddress: firewall.outputs.privateIPAddress
+    routeNextHopIpAddress: '10.0.100.4' // firewall.outputs.privateIPAddress
     routeNextHopType: routeTableRouteNextHopType
   }
 }
 
-resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2018-11-01' = {
   name: '${virtualNetworkName}/${subnetName}'
   properties: {
     addressPrefix: subnetAddressPrefix
@@ -137,13 +137,13 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
     routeTable: {
       id: routeTable.outputs.id
     }
-    serviceEndpoints: subnetServiceEndpoints    
+    // serviceEndpoints: subnetServiceEndpoints    
     privateEndpointNetworkPolicies: 'Disabled'
     privateLinkServiceNetworkPolicies: 'Enabled'
   }
   dependsOn: [
     virtualNetwork
-    firewall
+    // firewall
   ]
 }
 
@@ -158,11 +158,11 @@ module firewallClientPublicIPAddress './publicIPAddress.bicep' = {
     publicIpAllocationMethod: firewallClientPublicIpAllocationMethod
     availabilityZones: firewallClientPublicIPAddressAvailabilityZones
 
-    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
-    logStorageAccountResourceId: logStorage.outputs.id
+    // logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+    // logStorageAccountResourceId: logStorage.outputs.id
 
-    logs: publicIPAddressDiagnosticsLogs
-    metrics: publicIPAddressDiagnosticsMetrics
+    // logs: publicIPAddressDiagnosticsLogs
+    // metrics: publicIPAddressDiagnosticsMetrics
   }
 }
 
@@ -177,55 +177,55 @@ module firewallManagementPublicIPAddress './publicIPAddress.bicep' = {
     publicIpAllocationMethod: firewallManagementPublicIpAllocationMethod
     availabilityZones: firewallManagementPublicIPAddressAvailabilityZones
 
-    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
-    logStorageAccountResourceId: logStorage.outputs.id
+    // logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+    // logStorageAccountResourceId: logStorage.outputs.id
 
-    logs: publicIPAddressDiagnosticsLogs
-    metrics: publicIPAddressDiagnosticsMetrics
+    // logs: publicIPAddressDiagnosticsLogs
+    // metrics: publicIPAddressDiagnosticsMetrics
   }
 }
 
-module firewall './firewall.bicep' = {
-  name: 'firewall'
-  params: {
-    name: firewallName
-    location: location
-    tags: tags
+// module firewall './firewall.bicep' = {
+//   name: 'firewall'
+//   params: {
+//     name: firewallName
+//     location: location
+//     tags: tags
 
-    skuTier: firewallSkuTier
+//     skuTier: firewallSkuTier
 
-    firewallPolicyName: firewallPolicyName
-    threatIntelMode: firewallThreatIntelMode
+//     firewallPolicyName: firewallPolicyName
+//     threatIntelMode: firewallThreatIntelMode
 
-    clientIpConfigurationName: firewallClientIpConfigurationName
-    clientIpConfigurationSubnetResourceId: '${virtualNetwork.outputs.id}/subnets/${firewallClientSubnetName}'
-    clientIpConfigurationPublicIPAddressResourceId: firewallClientPublicIPAddress.outputs.id
+//     clientIpConfigurationName: firewallClientIpConfigurationName
+//     clientIpConfigurationSubnetResourceId: '${virtualNetwork.outputs.id}/subnets/${firewallClientSubnetName}'
+//     clientIpConfigurationPublicIPAddressResourceId: firewallClientPublicIPAddress.outputs.id
 
-    managementIpConfigurationName: firewallManagementIpConfigurationName
-    managementIpConfigurationSubnetResourceId: '${virtualNetwork.outputs.id}/subnets/${firewallManagementSubnetName}'
-    managementIpConfigurationPublicIPAddressResourceId: firewallManagementPublicIPAddress.outputs.id
+//     managementIpConfigurationName: firewallManagementIpConfigurationName
+//     managementIpConfigurationSubnetResourceId: '${virtualNetwork.outputs.id}/subnets/${firewallManagementSubnetName}'
+//     managementIpConfigurationPublicIPAddressResourceId: firewallManagementPublicIPAddress.outputs.id
     
-    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
-    logStorageAccountResourceId: logStorage.outputs.id
+//     // logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+//     // logStorageAccountResourceId: logStorage.outputs.id
 
-    logs: firewallDiagnosticsLogs
-    metrics: firewallDiagnosticsMetrics
-  }
-}
+//     // logs: firewallDiagnosticsLogs
+//     // metrics: firewallDiagnosticsMetrics
+//   }
+// }
 
-module azureMonitorPrivateLink './privateLink.bicep' = {
-  name: 'azure-monitor-private-link'
-  params: {
-    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
-    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
-    privateEndpointSubnetName: subnetName
-    privateEndpointVnetName: virtualNetwork.outputs.name
-    tags: tags
-  }
-  dependsOn: [
-    subnet
-  ]
-}
+// module azureMonitorPrivateLink './privateLink.bicep' = {
+//   name: 'azure-monitor-private-link'
+//   params: {
+//     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+//     logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+//     privateEndpointSubnetName: subnetName
+//     privateEndpointVnetName: virtualNetwork.outputs.name
+//     tags: tags
+//   }
+//   dependsOn: [
+//     subnet
+//   ]
+// }
 
 output virtualNetworkName string = virtualNetwork.outputs.name
 output virtualNetworkResourceId string = virtualNetwork.outputs.id
@@ -234,4 +234,4 @@ output subnetAddressPrefix string = subnet.properties.addressPrefix
 output subnetResourceId string = subnet.id
 output networkSecurityGroupName string = networkSecurityGroup.outputs.name
 output networkSecurityGroupResourceId string = networkSecurityGroup.outputs.id
-output firewallPrivateIPAddress string = firewall.outputs.privateIPAddress
+// output firewallPrivateIPAddress string = firewall.outputs.privateIPAddress

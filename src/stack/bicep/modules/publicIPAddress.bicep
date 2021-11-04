@@ -6,13 +6,13 @@ param skuName string
 param publicIpAllocationMethod string
 param availabilityZones array
 
-param logStorageAccountResourceId string
-param logAnalyticsWorkspaceResourceId string
+// param logStorageAccountResourceId string
+// param logAnalyticsWorkspaceResourceId string
 
-param logs array
-param metrics array
+// param logs array
+// param metrics array
 
-resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
+resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2018-11-01' = {
   name: name
   location: location
   tags: tags
@@ -28,15 +28,15 @@ resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
   zones: availabilityZones
 }
 
-resource diagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
-  scope: publicIPAddress
-  name: '${publicIPAddress.name}-diagnostics'
-  properties: {
-    storageAccountId: logStorageAccountResourceId
-    workspaceId: logAnalyticsWorkspaceResourceId
-    logs: logs
-    metrics: metrics
-  }
-}
+// resource diagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = {
+//   scope: publicIPAddress
+//   name: '${publicIPAddress.name}-diagnostics'
+//   properties: {
+//     storageAccountId: logStorageAccountResourceId
+//     // workspaceId: logAnalyticsWorkspaceResourceId
+//     // logs: logs
+//     // metrics: metrics
+//   }
+// }
 
 output id string = publicIPAddress.id
